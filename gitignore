@@ -1,0 +1,25 @@
+# Java
+*.class
+*.jar
+*.war
+*.log
+
+# Build
+target/
+build/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+
+# Node
+node_modules/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
