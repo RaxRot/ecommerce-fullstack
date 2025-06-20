@@ -1,14 +1,14 @@
 package com.raxrot.back.controller;
 
+import com.raxrot.back.configuration.AppConfig;
 import com.raxrot.back.dto.CategoryDTO;
+import com.raxrot.back.dto.CategoryResponse;
 import com.raxrot.back.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -30,12 +30,23 @@ public class CategoryController {
     }
 
     @GetMapping("/public/categories")
-    public ResponseEntity<List<CategoryDTO>> getCategories() {
-        log.debug("GET /api/public/categories");
-        List<CategoryDTO> categories = categoryService.getAllCategories();
-        log.info("Returned {} categories", categories.size());
+    public ResponseEntity<CategoryResponse> getCategories(
+            @RequestParam(name = "pageNumber", defaultValue = AppConfig.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConfig.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConfig.SORT_BY_ID, required = false) String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConfig.SORT_ORDER_ASC, required = false) String sortOrder
+    ) {
+        log.debug("GET /api/public/categories?pageNumber={}&pageSize={}&sortBy={}&sortOrder={}",
+                pageNumber, pageSize, sortBy, sortOrder);
+
+        CategoryResponse categories = categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortOrder);
+
+        log.info("Returned {} categories (page {} of {})",
+                categories.getContent().size(), categories.getPageNumber() + 1, categories.getTotalPages());
+
         return ResponseEntity.ok(categories);
     }
+
 
     @GetMapping("/public/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> getCategory(@PathVariable Long categoryId) {
