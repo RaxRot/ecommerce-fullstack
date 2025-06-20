@@ -47,7 +47,6 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
-
     @GetMapping("/public/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> getCategory(@PathVariable Long categoryId) {
         log.debug("GET /api/public/categories/{}", categoryId);
