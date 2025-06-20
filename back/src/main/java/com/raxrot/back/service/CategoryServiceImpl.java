@@ -6,10 +6,9 @@ import com.raxrot.back.model.Category;
 import com.raxrot.back.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,13 +33,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDTO> getAllCategories() {
+    public Page<CategoryDTO> getAllCategories(Pageable pageable) {
         log.debug("Fetching all categories");
-        List<Category> categories = categoryRepository.findAll();
-        log.info("Found {} categories", categories.size());
-        return categories.stream()
-                .map(category -> modelMapper.map(category, CategoryDTO.class))
-                .collect(Collectors.toList());
+        Page<Category> categories = categoryRepository.findAll(pageable);
+        log.info("Found {} categories", categories.getTotalElements());
+        return categories.map(category -> modelMapper.map(category, CategoryDTO.class));
     }
 
     @Override
