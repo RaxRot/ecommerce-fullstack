@@ -12,6 +12,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequestMapping("/api")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -20,7 +21,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @PostMapping("/api/admin/category")
+    @PostMapping("/admin/category")
     public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
         log.info("POST /api/admin/category - Payload: {}", categoryDTO);
         CategoryDTO createdCategory = categoryService.createCategory(categoryDTO);
@@ -28,7 +29,7 @@ public class CategoryController {
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
-    @GetMapping("/api/public/categories")
+    @GetMapping("/public/categories")
     public ResponseEntity<List<CategoryDTO>> getCategories() {
         log.debug("GET /api/public/categories");
         List<CategoryDTO> categories = categoryService.getAllCategories();
@@ -36,7 +37,7 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/api/public/categories/{categoryId}")
+    @GetMapping("/public/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> getCategory(@PathVariable Long categoryId) {
         log.debug("GET /api/public/categories/{}", categoryId);
         CategoryDTO categoryDTO = categoryService.getCategoryById(categoryId);
@@ -44,7 +45,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryDTO);
     }
 
-    @PutMapping("/api/admin/categories/{categoryId}")
+    @PutMapping("/admin/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long categoryId,
                                                       @Valid @RequestBody CategoryDTO categoryDTO) {
         log.info("PUT /api/admin/categories/{} - Payload: {}", categoryId, categoryDTO);
@@ -53,7 +54,7 @@ public class CategoryController {
         return ResponseEntity.ok(updatedCategory);
     }
 
-    @DeleteMapping("/api/admin/categories/{categoryId}")
+    @DeleteMapping("/admin/categories/{categoryId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
         log.info("DELETE /api/admin/categories/{}", categoryId);
         categoryService.deleteCategory(categoryId);
