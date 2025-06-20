@@ -4,13 +4,11 @@ import com.raxrot.back.dto.CategoryDTO;
 import com.raxrot.back.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -31,12 +29,11 @@ public class CategoryController {
     }
 
     @GetMapping("/api/public/categories")
-    public ResponseEntity<Page<CategoryDTO>> getCategories(
-            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        log.debug("GET /api/public/categories with paging: {}", pageable);
-        Page<CategoryDTO> categoriesPage = categoryService.getAllCategories(pageable);
-        log.info("Returned {} categories on page {}", categoriesPage.getNumberOfElements(), categoriesPage.getNumber());
-        return ResponseEntity.ok(categoriesPage);
+    public ResponseEntity<List<CategoryDTO>> getCategories() {
+        log.debug("GET /api/public/categories");
+        List<CategoryDTO> categories = categoryService.getAllCategories();
+        log.info("Returned {} categories", categories.size());
+        return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/api/public/categories/{categoryId}")
