@@ -1,15 +1,19 @@
 package com.raxrot.back.service;
 
 import com.raxrot.back.dto.CategoryDTO;
+import com.raxrot.back.dto.CategoryResponse;
 import com.raxrot.back.exception.ApiException;
 import com.raxrot.back.model.Category;
 import com.raxrot.back.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,14 +38,34 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDTO> getAllCategories() {
-        log.debug("Fetching all categories");
-        List<Category> categories = categoryRepository.findAll();
-        log.info("Found {} categories", categories.size());
-        return categories.stream()
+    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        log.debug("Fetching categories with pageNumber={}, pageSize={}, sortBy={}, sortOrder={}",
+                pageNumber, pageSize, sortBy, sortOrder);
+
+        Sort sort = sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<Category> categoryPage = categoryRepository.findAll(pageDetails);
+
+        List<CategoryDTO> categoryDTOS = categoryPage.getContent()
+                .stream()
                 .map(category -> modelMapper.map(category, CategoryDTO.class))
-                .collect(Collectors.toList());
+                .toList();
+
+        log.info("Found {} categories on page {} of {}",
+                categoryDTOS.size(), categoryPage.getNumber() + 1, categoryPage.getTotalPages());
+
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setContent(categoryDTOS);
+        categoryResponse.setPageNumber(categoryPage.getNumber());
+        categoryResponse.setPageSize(categoryPage.getSize());
+        categoryResponse.setTotalElements(categoryPage.getTotalElements());
+        categoryResponse.setTotalPages(categoryPage.getTotalPages());
+        categoryResponse.setLastPage(categoryPage.isLast());
+
+        return categoryResponse;
     }
+
 
 
     @Override
