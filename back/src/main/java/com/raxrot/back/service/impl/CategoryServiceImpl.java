@@ -1,10 +1,11 @@
-package com.raxrot.back.service;
+package com.raxrot.back.service.impl;
 
 import com.raxrot.back.dto.CategoryDTO;
 import com.raxrot.back.dto.CategoryResponse;
 import com.raxrot.back.exception.ApiException;
 import com.raxrot.back.model.Category;
 import com.raxrot.back.repository.CategoryRepository;
+import com.raxrot.back.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
