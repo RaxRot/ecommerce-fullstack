@@ -17,9 +17,9 @@ public class Product {
     private Long id;
     private String name;
     private String description;
+    private String image;
     private Integer quantity;
     private BigDecimal price;
-    private BigDecimal specialPrice;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
