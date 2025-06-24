@@ -42,4 +42,12 @@ public class ProductController {
         log.info("Returned {} products for category {}", response.getContent().size(), categoryId);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/public/products/keyword/{keyword}")
+    public ResponseEntity<ProductResponse> getProductsByKeyword(@PathVariable String keyword) {
+        log.debug("GET /api/public/products/keyword/{}", keyword);
+        ProductResponse productResponse = productService.searchProductByKeyword(keyword);
+        log.info("Returned {} products matching keyword '{}'", productResponse.getContent().size(), keyword);
+        return ResponseEntity.ok(productResponse);
+    }
 }
