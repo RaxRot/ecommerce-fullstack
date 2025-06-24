@@ -1,6 +1,7 @@
 package com.raxrot.back.controller;
 
 import com.raxrot.back.dto.ProductDTO;
+import com.raxrot.back.dto.ProductResponse;
 import com.raxrot.back.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -24,5 +25,13 @@ public class ProductController {
         ProductDTO createdProduct = productService.createProduct(categoryId, productDTO);
         log.info("Product created: name={}, categoryId={}", createdProduct.getName(), categoryId);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/public/products")
+    public ResponseEntity<ProductResponse> getAllProducts() {
+        log.debug("GET /api/public/products called");
+        ProductResponse productResponse = productService.getAllProducts();
+        log.info("Returned {} products", productResponse.getContent().size());
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 }

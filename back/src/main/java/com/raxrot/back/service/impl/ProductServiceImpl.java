@@ -1,6 +1,7 @@
 package com.raxrot.back.service.impl;
 
 import com.raxrot.back.dto.ProductDTO;
+import com.raxrot.back.dto.ProductResponse;
 import com.raxrot.back.exception.ApiException;
 import com.raxrot.back.model.Category;
 import com.raxrot.back.model.Product;
@@ -10,6 +11,9 @@ import com.raxrot.back.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -43,5 +47,23 @@ public class ProductServiceImpl implements ProductService {
         log.info("Product created: id={}, name={}", savedProduct.getId(), savedProduct.getName());
 
         return modelMapper.map(savedProduct, ProductDTO.class);
+    }
+
+    @Override
+    public ProductResponse getAllProducts() {
+        log.debug("Fetching all products");
+
+        List<Product> products = productRepository.findAll();
+        log.info("Found {} products", products.size());
+
+        List<ProductDTO> productDTOs = products.stream()
+                .map(product -> modelMapper.map(product, ProductDTO.class))
+                .collect(Collectors.toList());
+
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setContent(productDTOs);
+
+        log.debug("Returning product response with {} items", productDTOs.size());
+        return productResponse;
     }
 }
