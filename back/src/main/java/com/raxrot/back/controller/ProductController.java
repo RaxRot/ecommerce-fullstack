@@ -34,4 +34,12 @@ public class ProductController {
         log.info("Returned {} products", productResponse.getContent().size());
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
+
+    @GetMapping("/public/categories/{categoryId}/products")
+    public ResponseEntity<ProductResponse> getProductsByCategory(@PathVariable Long categoryId) {
+        log.debug("GET /api/public/categories/{}/products", categoryId);
+        ProductResponse response = productService.searchByCategory(categoryId);
+        log.info("Returned {} products for category {}", response.getContent().size(), categoryId);
+        return ResponseEntity.ok(response);
+    }
 }
