@@ -130,4 +130,17 @@ public class ProductServiceImpl implements ProductService {
 
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
+
+    @Override
+    public void deleteProduct(Long productId) {
+        log.debug("Attempting to delete product with id: {}", productId);
+
+        if (!productRepository.existsById(productId)) {
+            log.warn("Product not found with id: {}", productId);
+            throw new ApiException(PRODUCT_NOT_FOUND + productId);
+        }
+
+        productRepository.deleteById(productId);
+        log.info("Deleted product with id: {}", productId);
+    }
 }

@@ -61,4 +61,12 @@ public class ProductController {
         log.info("Product updated: id={}, name={}", updatedProduct.getId(), updatedProduct.getName());
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
+
+    @DeleteMapping("/admin/products/{productId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
+        log.debug("DELETE /api/admin/products/{}", productId);
+        productService.deleteProduct(productId);
+        log.info("Product with id={} successfully deleted", productId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
