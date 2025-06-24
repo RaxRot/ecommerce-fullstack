@@ -50,4 +50,15 @@ public class ProductController {
         log.info("Returned {} products matching keyword '{}'", productResponse.getContent().size(), keyword);
         return ResponseEntity.ok(productResponse);
     }
+
+    @PutMapping("/products/{productId}")
+    public ResponseEntity<ProductDTO> updateProduct(
+            @PathVariable Long productId,
+            @Valid @RequestBody ProductDTO productDTO) {
+
+        log.debug("PUT /api/products/{} called", productId);
+        ProductDTO updatedProduct = productService.updateProduct(productId, productDTO);
+        log.info("Product updated: id={}, name={}", updatedProduct.getId(), updatedProduct.getName());
+        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
+    }
 }

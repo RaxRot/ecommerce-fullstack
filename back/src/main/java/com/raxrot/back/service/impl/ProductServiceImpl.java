@@ -108,4 +108,26 @@ public class ProductServiceImpl implements ProductService {
 
         return productResponse;
     }
+
+    @Override
+    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
+        log.debug("Updating product with id: {}", productId);
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ApiException(PRODUCT_NOT_FOUND + productId));
+
+        log.info("Found product: {}", product.getName());
+
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setImage(productDTO.getImage());
+        product.setQuantity(productDTO.getQuantity());
+        product.setPrice(productDTO.getPrice());
+
+        Product savedProduct = productRepository.save(product);
+
+        log.info("Updated product: {}", savedProduct.getName());
+
+        return modelMapper.map(savedProduct, ProductDTO.class);
+    }
 }
