@@ -12,6 +12,10 @@ import com.raxrot.back.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,11 +65,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getAllProducts() {
+    public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         log.debug("Fetching all products");
 
-        List<Product> products = productRepository.findAll();
-        log.info("Found {} products", products.size());
+        Sort sort =sortOrder.equalsIgnoreCase("desc")?
+                Sort.by(sortBy).descending():
+                Sort.by(sortBy).ascending();
+
+        Pageable pageDetails=PageRequest.of(pageNumber, pageSize, sort);
+        Page<Product> products = productRepository.findAll(pageDetails);
+
+
 
         List<ProductDTO> productDTOs = products.stream()
                 .map(product -> modelMapper.map(product, ProductDTO.class))
@@ -73,6 +83,11 @@ public class ProductServiceImpl implements ProductService {
 
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOs);
+        productResponse.setPageNumber(products.getNumber());
+        productResponse.setPageSize(products.getSize());
+        productResponse.setTotalElements(products.getTotalElements());
+        productResponse.setTotalPages(products.getTotalPages());
+        productResponse.setLastPage(products.isLast());
 
         log.debug("Returning product response with {} items", productDTOs.size());
         return productResponse;
