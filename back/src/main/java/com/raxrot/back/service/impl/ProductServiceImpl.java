@@ -7,11 +7,14 @@ import com.raxrot.back.model.Category;
 import com.raxrot.back.model.Product;
 import com.raxrot.back.repository.CategoryRepository;
 import com.raxrot.back.repository.ProductRepository;
+import com.raxrot.back.service.FileService;
 import com.raxrot.back.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,10 +27,13 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository,ModelMapper modelMapper) {
+    private final FileService fileService;
+
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository,ModelMapper modelMapper, FileService fileService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
+        this.fileService = fileService;
     }
 
     @Override
@@ -142,5 +148,32 @@ public class ProductServiceImpl implements ProductService {
 
         productRepository.deleteById(productId);
         log.info("Deleted product with id: {}", productId);
+    }
+
+    @Override
+    public ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException {
+        //Get Product From DB
+        log.debug("Trying to update image for productId: {}", productId);
+        Product productFromDb = productRepository.findById(productId)
+                .orElseThrow(() -> {
+                    log.warn("Product not found with id: {}", productId);
+                    return new ApiException(PRODUCT_NOT_FOUND + productId);
+                });
+
+        //Upload Image to server
+        //Get filename of uploaded image
+        String path = "images";
+        String fileName = fileService.uploadImage(path, image);
+        log.info("Image uploaded successfully: {}", fileName);
+
+        //Updating the new filename to product
+        productFromDb.setImage(fileName);
+
+        //Save upd Product
+        Product updatedProduct = productRepository.save(productFromDb);
+        log.debug("Product image updated in DB for productId: {}", productId);
+
+        //return DTO
+        return modelMapper.map(updatedProduct, ProductDTO.class);
     }
 }

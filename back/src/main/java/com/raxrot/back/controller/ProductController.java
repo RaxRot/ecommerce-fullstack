@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -68,5 +71,16 @@ public class ProductController {
         productService.deleteProduct(productId);
         log.info("Product with id={} successfully deleted", productId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/products/{productId}/image")
+    public ResponseEntity<ProductDTO> updateProductImage(@PathVariable Long productId,
+                                                         @RequestParam("image") MultipartFile image) throws IOException {
+        log.debug("Received request to update image for productId: {}", productId);
+
+        ProductDTO updatedProduct = productService.updateProductImage(productId, image);
+
+        log.info("Image updated for productId: {}", productId);
+        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
 }
